@@ -1,0 +1,135 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 201 96% 32%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 201 96% 32%;
+    --radius: 0.5rem;
+    --clinic-50: 206 100% 97%;
+    --clinic-100: 205 96% 94%;
+    --clinic-200: 202 96% 89%;
+    --clinic-300: 201 97% 79%;
+    --clinic-400: 200 96% 67%;
+    --clinic-500: 201 96% 55%;
+    --clinic-600: 201 96% 44%;
+    --clinic-700: 202 97% 37%;
+    --clinic-800: 202 96% 31%;
+    --clinic-900: 205 97% 25%;
+    --clinic-950: 206 100% 16%;
+  }
+ 
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 201 96% 32%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Open Sans', sans-serif;
+  }
+
+  /* Page Container */
+  .page-container {
+    @apply container py-6 space-y-6 overflow-auto;
+    max-height: calc(100vh - 64px);
+  }
+
+  /* Form Styles */
+  .form-group {
+    @apply space-y-1.5 mb-4;
+  }
+
+  .form-label {
+    @apply block text-sm font-medium leading-none mb-2;
+  }
+
+  .form-input {
+    @apply flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .form-description {
+    @apply text-xs text-muted-foreground;
+  }
+
+  .inline-form {
+    @apply flex flex-row gap-2 items-end;
+  }
+
+  /* Table styles */
+  .data-table {
+    @apply w-full border-collapse;
+  }
+
+  .data-table thead th {
+    @apply border-b text-left text-muted-foreground text-xs font-medium px-4 py-2;
+  }
+
+  .data-table tbody td {
+    @apply px-4 py-2 border-b border-border;
+  }
+
+  .data-table tbody tr:hover {
+    @apply bg-accent/50;
+  }
+
+  /* Accent colors for user roles */
+  .role-admin {
+    @apply bg-destructive/10 text-destructive font-medium;
+  }
+
+  .role-doctor {
+    @apply bg-blue-100 text-blue-800 font-medium;
+  }
+
+  .role-nurse {
+    @apply bg-green-100 text-green-800 font-medium;
+  }
+
+  .role-receptionist {
+    @apply bg-amber-100 text-amber-800 font-medium;
+  }
+}

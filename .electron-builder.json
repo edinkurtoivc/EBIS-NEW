@@ -1,0 +1,29 @@
+
+{
+  "appId": "com.eibs.app",
+  "productName": "EIBS",
+  "directories": {
+    "output": "release"
+  },
+  "files": [
+    "dist/**/*",
+    "electron/**/*"
+  ],
+  "extraResources": [
+    {
+      "from": "resources",
+      "to": "resources"
+    }
+  ],
+  "mac": {
+    "category": "public.app-category.medical",
+    "target": "dmg"
+  },
+  "win": {
+    "target": "nsis"
+  },
+  "linux": {
+    "target": "AppImage",
+    "category": "Medical"
+  }
+}

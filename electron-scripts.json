@@ -1,0 +1,13 @@
+
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "electron:dev": "node electron/start-electron.js",
+    "electron:start": "cross-env NODE_ENV=development electron electron/index.js",
+    "electron:build": "npm run build && electron-builder",
+    "electron:package": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
+  }
+}
