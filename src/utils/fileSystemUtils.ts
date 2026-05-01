@@ -196,6 +196,12 @@ export const createFolderIfNotExists = async (path: string): Promise<boolean> =>
   }
 };
 
+
+export const getPatientFolderName = (patient: Patient): string => {
+  const typedPatient = ensurePatient(patient);
+  return `${typedPatient.name.replace(/\s+/g, '_')}_${typedPatient.jmbg}`;
+};
+
 /**
  * Create patient directory and save initial patient data
  */
@@ -207,7 +213,7 @@ export const createPatientDirectory = async (basePath: string, patient: Patient)
     const typedPatient = ensurePatient(patient);
     
     // Create patient folder name
-    const folderName = `${typedPatient.name.replace(/\s+/g, '_')}_${typedPatient.jmbg}`;
+    const folderName = getPatientFolderName(typedPatient);
     const patientDir = `${basePath}${DEFAULT_DIRS.PATIENTS}/${folderName}`;
     
     // Create directory
