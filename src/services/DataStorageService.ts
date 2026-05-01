@@ -86,13 +86,27 @@ class DataStorageService {
     }
   }
 
+
+  private parseLocalStorageArray<T>(key: string): T[] {
+    const raw = localStorage.getItem(key);
+    if (!raw) return [];
+
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed as T[] : [];
+    } catch (error) {
+      console.warn(`[DataStorage] Invalid localStorage JSON for key: ${key}`, error);
+      localStorage.removeItem(key);
+      return [];
+    }
+  }
+
   /**
    * Get patients data
    */
   async getPatients() {
     if (this._fallbackToLocalStorage || !this.basePath) {
-      const localData = localStorage.getItem('patients');
-      return localData ? JSON.parse(localData) : [];
+      return this.parseLocalStorageArray<Patient>('patients');
     }
     
     try {
@@ -102,8 +116,7 @@ class DataStorageService {
     } catch (error) {
       console.error("[DataStorage] Error reading patients:", error);
       // Fallback to localStorage
-      const localData = localStorage.getItem('patients');
-      return localData ? JSON.parse(localData) : [];
+      return this.parseLocalStorageArray<Patient>('patients');
     }
   }
 
@@ -112,21 +125,22 @@ class DataStorageService {
    */
   async savePatient(patient: Patient) {
     try {
-      // Ensure patient has an ID
-      if (!patient.id) {
-        // Generate a numeric ID from UUID
-        patient.id = parseInt(uuidv4().replace(/-/g, '').substring(0, 8), 16);
-      }
-      
+      const patientToSave: Patient = patient.id
+        ? patient
+        : {
+            ...patient,
+            id: parseInt(uuidv4().replace(/-/g, '').substring(0, 8), 16),
+          };
+
       // Always update localStorage for compatibility
       const existingPatients = await this.getPatients();
-      const existingIndex = existingPatients.findIndex(p => p.id === patient.id);
+      const existingIndex = existingPatients.findIndex(p => p.id === patientToSave.id);
       
       let updatedPatients;
       if (existingIndex >= 0) {
-        updatedPatients = existingPatients.map(p => p.id === patient.id ? patient : p);
+        updatedPatients = existingPatients.map(p => p.id === patientToSave.id ? patientToSave : p);
       } else {
-        updatedPatients = [...existingPatients, patient];
+        updatedPatients = [...existingPatients, patientToSave];
       }
       
       localStorage.setItem('patients', JSON.stringify(updatedPatients));
@@ -145,17 +159,17 @@ class DataStorageService {
       
       // Create or update patient directory
       const folderName = existingIndex >= 0 
-        ? `${patient.firstName}_${patient.lastName}_${patient.jmbg}` 
-        : await createPatientDirectory(this.basePath, patient);
+        ? `${patientToSave.firstName}_${patientToSave.lastName}_${patientToSave.jmbg}` 
+        : await createPatientDirectory(this.basePath, patientToSave);
       
       // If new patient was created, we're done as createPatientDirectory already writes the files
       if (existingIndex >= 0 && folderName) {
         const patientDir = `${this.basePath}${DEFAULT_DIRS.PATIENTS}/${folderName}`;
-        await writeJsonData(`${patientDir}/karton.json`, patient);
+        await writeJsonData(`${patientDir}/karton.json`, patientToSave);
       }
       
       // Log the action
-      await logAction(this.basePath, `Updated patient: ${patient.firstName} ${patient.lastName} (ID: ${patient.id})`);
+      await logAction(this.basePath, `Updated patient: ${patientToSave.firstName} ${patientToSave.lastName} (ID: ${patientToSave.id})`);
       
       return true;
     } catch (error) {
@@ -169,8 +183,7 @@ class DataStorageService {
    */
   async getAppointments() {
     if (this._fallbackToLocalStorage || !this.basePath) {
-      const localData = localStorage.getItem('appointments');
-      return localData ? JSON.parse(localData) : [];
+      return this.parseLocalStorageArray<Appointment>('appointments');
     }
     
     try {
@@ -180,8 +193,7 @@ class DataStorageService {
     } catch (error) {
       console.error("[DataStorage] Error reading appointments:", error);
       // Fallback to localStorage
-      const localData = localStorage.getItem('appointments');
-      return localData ? JSON.parse(localData) : [];
+      return this.parseLocalStorageArray<Appointment>('appointments');
     }
   }
   
@@ -220,32 +232,28 @@ class DataStorageService {
    */
   async addAppointment(appointment: Appointment) {
     try {
-      // Ensure appointment has an ID
-      if (!appointment.id) {
-        appointment.id = `apt-${Date.now()}`;
-      }
-      
-      // Ensure scheduledAt is set
-      if (!appointment.scheduledAt) {
-        appointment.scheduledAt = new Date().toISOString();
-      }
-      
+      const appointmentToSave: Appointment = {
+        ...appointment,
+        id: appointment.id || `apt-${Date.now()}`,
+        scheduledAt: appointment.scheduledAt || new Date().toISOString(),
+      };
+
       const currentAppointments = await this.getAppointments();
       
       // Check if appointment with same ID already exists
-      const existingIndex = currentAppointments.findIndex(a => a.id === appointment.id);
+      const existingIndex = currentAppointments.findIndex(a => a.id === appointmentToSave.id);
       let updatedAppointments;
       
       if (existingIndex >= 0) {
         // Update existing appointment
         updatedAppointments = currentAppointments.map(a => 
-          a.id === appointment.id ? appointment : a
+          a.id === appointmentToSave.id ? appointmentToSave : a
         );
-        console.log("[DataStorage] Updated existing appointment:", appointment.id);
+        console.log("[DataStorage] Updated existing appointment:", appointmentToSave.id);
       } else {
         // Add new appointment
-        updatedAppointments = [...currentAppointments, appointment];
-        console.log("[DataStorage] Added new appointment:", appointment.id);
+        updatedAppointments = [...currentAppointments, appointmentToSave];
+        console.log("[DataStorage] Added new appointment:", appointmentToSave.id);
       }
       
       return await this.saveAppointments(updatedAppointments);
