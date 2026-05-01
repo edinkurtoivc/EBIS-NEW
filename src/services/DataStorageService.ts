@@ -86,13 +86,27 @@ class DataStorageService {
     }
   }
 
+
+  private parseLocalStorageArray<T>(key: string): T[] {
+    const raw = localStorage.getItem(key);
+    if (!raw) return [];
+
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed as T[] : [];
+    } catch (error) {
+      console.warn(`[DataStorage] Invalid localStorage JSON for key: ${key}`, error);
+      localStorage.removeItem(key);
+      return [];
+    }
+  }
+
   /**
    * Get patients data
    */
   async getPatients() {
     if (this._fallbackToLocalStorage || !this.basePath) {
-      const localData = localStorage.getItem('patients');
-      return localData ? JSON.parse(localData) : [];
+      return this.parseLocalStorageArray<Patient>('patients');
     }
     
     try {
@@ -102,8 +116,7 @@ class DataStorageService {
     } catch (error) {
       console.error("[DataStorage] Error reading patients:", error);
       // Fallback to localStorage
-      const localData = localStorage.getItem('patients');
-      return localData ? JSON.parse(localData) : [];
+      return this.parseLocalStorageArray<Patient>('patients');
     }
   }
 
@@ -169,8 +182,7 @@ class DataStorageService {
    */
   async getAppointments() {
     if (this._fallbackToLocalStorage || !this.basePath) {
-      const localData = localStorage.getItem('appointments');
-      return localData ? JSON.parse(localData) : [];
+      return this.parseLocalStorageArray<Appointment>('appointments');
     }
     
     try {
@@ -180,8 +192,7 @@ class DataStorageService {
     } catch (error) {
       console.error("[DataStorage] Error reading appointments:", error);
       // Fallback to localStorage
-      const localData = localStorage.getItem('appointments');
-      return localData ? JSON.parse(localData) : [];
+      return this.parseLocalStorageArray<Appointment>('appointments');
     }
   }
   
